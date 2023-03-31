@@ -1,3 +1,5 @@
+Please see the code at https://github.com/bboylen/data-scrubber
+
 To run the script, make sure you have Ruby installed on your system. The script requires two input files: a text file containing a list of sensitive field names (one per line) and a JSON file containing the user data to be scrubbed.
 
 To execute the script, first make it executable with the following command:
