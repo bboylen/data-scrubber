@@ -28,7 +28,7 @@ def scrub(sensitive_fields, data, within_sensitive_field = false)
 end
 
 if ARGV.length != 2
-  puts "Usage: scrub.rb sensitive_fields.txt input.json"
+  puts "Usage: scrub sensitive_fields.txt input.json"
   exit 1
 end
 
