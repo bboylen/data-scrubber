@@ -3,9 +3,26 @@
 require 'json'
 require 'set'
 
-def scrub(sensitive_fields, data)
+def scrub(sensitive_fields, data, within_sensitive_field = false)
   data.each do |key, value|
-    # handle everything
+    if sensitive_fields.include?(key) || within_sensitive_field
+      case value
+      when String
+        data[key] = value.gsub(/\w/, '*')
+      when Numeric
+        data[key] = value.to_s.gsub(/\w/, '*')
+      when TrueClass, FalseClass
+        data[key] = "-"
+      when Array
+        data[key] = value.map { |v| scrub(sensitive_fields, { key => v }, true)[key]}
+      when Hash
+        data[key] = scrub(sensitive_fields, value, true)
+      end
+    elsif value.is_a?(Hash)
+      data[key] = scrub(sensitive_fields, value)
+    elsif value.is_a?(Array)
+      data[key] = value.map { |v| v.is_a?(Hash) ? scrub(sensitive_fields, v) : v }
+    end
   end
   data
 end
@@ -22,7 +39,7 @@ begin
   input_json = JSON.parse(File.read(input_json_file))
 rescue StandardError => e
   puts "Error: #{e.message}"
-  exit(1)
+  exit 1
 end
 
 scrubbed_json = scrub(sensitive_fields, input_json)
